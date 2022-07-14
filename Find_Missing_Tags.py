@@ -70,7 +70,7 @@ def summary_text():
     global unkown_error
 
     print("")
-    print(f"This script moved {count} albums out of {total_count} folders examined.")
+    print(f"This script moved {count} albums out of {total_count} albums examined.")
     print("This script looks for potential missing files or errors. The following messages outline whether any were found.")
 
     error_status = error_exists(unkown_error)
@@ -102,7 +102,9 @@ def move_albums(move_set):
         print("Move completed.")
         count += 1  # variable will increment every loop iteration        
 
+# A function to check whether the directory is a an album or a sub-directory
 def level_check(directory):
+    global total_count
     global album_location
     
     print("")
@@ -118,6 +120,7 @@ def level_check(directory):
     # Checks to see if a folder is an album or subdirectory by looking at how many segments are in a path
     if album_location == directory_location:
         print("--This is an album.")
+        total_count += 1  # variable will increment every loop iteration
         return True
     elif album_location < directory_location:
         print("--This is a sub-directory")
@@ -126,22 +129,72 @@ def level_check(directory):
         print("--Something is wrong.")
         return False
 
-    
+# A function to check whether a directory has flac and should be checked further    
 def flac_check(directory):
     
     #Loop through the directory and see if any file is a flac
     for fname in os.listdir(directory):
         if fname.endswith('.flac'):
-            print("There are flac in this directory.")
+            print("--There are flac in this directory.")
             return True
         else:
-            print("There are no flac in this directory.")
+            print("--There are no flac in this directory.")
             return False
 
+# A function to check the tags of each file and sort it if critical tags are missing
+def tag_check(directory,is_album):
+    global count
+    global bad_tag_directory
+    global album_location
+    global album_directory
+    global move_set
+    
+    # Get the album name
+    segments = directory.split(os.sep)
+    album_location_index = album_location -1
+    album_name = str(segments[album_location_index])
+    
+    # Handle directories vs sub-directories by defining start path taking into account is_album depth
+    if is_album == True:
+        start_path = directory
+    else:
+        #build the path by joining the album directory path with the album name
+        print(f"--The album is {album_location} folders deep")
+        start_path = os.path.join(album_directory,album_name)
+    
+    
+    print(f"--The starting path is: {start_path}")
+    print(f"--The album name is: {album_name}")
+    
+    
+    
+    #loop through direct
+    for fname in os.listdir(directory):
+        if fname.endswith('.flac'):
+            meta_data = mutagen.File(fname)
+            #print(f"Track Checked: {meta_data['artist'][0]} - {meta_data['title'][0]}")
+            if "tracknumber" not in meta_data:
+                print("--Failure: Metadata Missing: Track Number")
+                print("--This should be moved to the Missing Tags folder.")
+                target = os.path.join(bad_tag_directory, album_name)
+                print(f"--The target is: {target}")
+                # make the pair a tupple
+                move_pair = (start_path, target)
+                # adds the tupple to the list
+                move_set.add(move_pair)
+                count += 1  # variable will increment every loop iteration
+                return False
+                
+    return True
+
+        
+
+        
+        
+        
         
 # The main function that controls the flow of the script
 def main():
-    global total_count
     global move_set
     global album_location
 
@@ -165,16 +218,16 @@ def main():
             is_flac = flac_check(i)
             # check for meta data and sort
             if is_flac ==True:
-                tag_check(i)
-            total_count += 1  # variable will increment every loop iteration
+                tag_check(i,is_album)
+            
 
-        '''# Change directory so the album directory can be moved and move them
+        # Change directory so the album directory can be moved and move them
         os.chdir(log_directory)
 
         # Move the albums to the folders the need to be sorted into
         print("")
         print("Part 2: Moving")
-        move_albums(move_set)'''
+        move_albums(move_set)
 
     finally:
         # Summary text
