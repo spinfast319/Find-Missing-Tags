@@ -1,8 +1,12 @@
 # Find Missing Tags
 # author: hypermodified
-# This python script loops through a directory and looks for albums that are missing track number, title, artist or album tags
+# This python script loops through a directory and looks for albums that are missing track number, title, artist, or album tags
 # It moves them to a folder for retagging.
+# It can handle albums with artwork folders or multiple disc folders in them. It can also handle specials characters.
 # It has been tested and works in both Ubuntu Linux and Windows 10.
+
+# Before running this script install the dependencies
+# pip install mutagen
 
 # Import dependencies
 import os  # Imports functionality that let's you interact with your operating system
