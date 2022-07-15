@@ -128,8 +128,8 @@ def level_check(directory):
     elif album_location < directory_location:
         print("--This is a sub-directory")
         return False
-    elif album_location > directory_location:
-        print("--Something is wrong.")
+    elif album_location > directory_location and album_depth == 2:
+        print("--This is an artist folder.")
         return False
 
 
@@ -153,18 +153,27 @@ def tag_check(directory, is_album):
     global album_directory
     global move_set
     global tags_missing
+    global album_depth
 
     # Get the album name
     segments = directory.split(os.sep)
     album_location_index = album_location - 1
     album_name = str(segments[album_location_index])
 
+    # If the album depth is 2, get the artist name
+    if album_depth == 2:
+        artist_location_index = album_location - 2
+        artist_name = str(segments[artist_location_index])
+
     # Handle directories vs sub-directories by defining start path taking into account is_album depth
     if is_album == True:
         start_path = directory
-    else:
+    elif album_depth == 1:
         # build the path by joining the album directory path with the album name
         start_path = os.path.join(album_directory, album_name)
+    elif album_depth == 2:
+        # build the path by joining the album directory path with the artist and album name
+        start_path = os.path.join(album_directory, artist_name, album_name)
 
     # loop through directory and look for missing tags
     for fname in os.listdir(directory):
@@ -173,7 +182,10 @@ def tag_check(directory, is_album):
             if "tracknumber" not in meta_data or "artist" not in meta_data or "title" not in meta_data or "album" not in meta_data:
                 print("--Failure: Metadata Missing")
                 print("--This should be moved to the Missing Tags folder.")
-                target = os.path.join(bad_tag_directory, album_name)
+                if album_depth == 1:
+                    target = os.path.join(bad_tag_directory, album_name)
+                elif album_depth == 2:
+                    target = os.path.join(bad_tag_directory, artist_name, album_name)
                 print(f"--The starting path is: {start_path}")
                 print(f"--The target is: {target}")
                 # make the pair a tupple
