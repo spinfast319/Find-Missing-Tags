@@ -6,8 +6,8 @@
 
 # Import dependencies
 import os  # Imports functionality that let's you interact with your operating system
-import shutil # Imports functionality that lets you copy files and directory
-import datetime # Imports functionality that lets you make timestamps
+import shutil  # Imports functionality that lets you copy files and directory
+import datetime  # Imports functionality that lets you make timestamps
 import mutagen  # Imports functionality to get metadata from music files
 
 #  Set your directories here
@@ -25,7 +25,7 @@ album_depth = 1
 count = 0
 total_count = 0
 error_message = 0
-unkown_error = 0
+tags_missing = 0
 
 # identifies album directory level
 path_segments = album_directory.split(os.sep)
@@ -39,7 +39,7 @@ move_set = set()
 def log_outcomes(directory, log_name, message):
     global log_directory
 
-    script_name = "Sort Albums with Origin Files Script"
+    script_name = "Find Missing Tags"
     today = datetime.datetime.now()
     log_name = f"{log_name}.txt"
     album_name = directory.split(os.sep)
@@ -52,6 +52,7 @@ def log_outcomes(directory, log_name, message):
         log_name.write(" \n")
         log_name.close()
 
+
 # A function that determines if there is an error
 def error_exists(error_type):
     global error_message
@@ -62,26 +63,27 @@ def error_exists(error_type):
     else:
         return "Info"
 
+
 # A function that writes a summary of what the script did at the end of the process
 def summary_text():
     global count
     global total_count
     global error_message
-    global unkown_error
+    global tags_missing
 
     print("")
-    print(f"This script moved {count} albums out of {total_count} albums examined.")
+    print(f"This script moved {count} albums for having bad tags out of {total_count} albums examined.")
     print("This script looks for potential missing files or errors. The following messages outline whether any were found.")
 
-    error_status = error_exists(unkown_error)
-    print(f"--{error_status}: There were {unkown_error} albums skipped due to not being able to open the yaml. Redownload the yaml file.")
-
+    error_status = error_exists(tags_missing)
+    print(f"--{error_status}: There were {tags_missing} albums missing either track number, title, artist or album tags. They were moved to the Missing Tags folder.")
 
     if error_message >= 1:
-        print("Check the logs to see which folders had errors and what they were.")
+        print("Check the logs to see which folders were moved.")
     else:
-        print("There were no errors.")        
-        
+        print("There were no errors.")
+
+
 # A function to move albums to the correct folder
 def move_albums(move_set):
     global count
@@ -100,23 +102,24 @@ def move_albums(move_set):
         print(f"--Destination: {target}")
         shutil.move(start_path, target)
         print("Move completed.")
-        count += 1  # variable will increment every loop iteration        
+        count += 1  # variable will increment every loop iteration
+
 
 # A function to check whether the directory is a an album or a sub-directory
 def level_check(directory):
     global total_count
     global album_location
-    
+
     print("")
     print(directory)
     print("Folder Depth:")
     print(f"--The albums are stored {album_location} folders deep.")
-    
+
     path_segments = directory.split(os.sep)
     directory_location = len(path_segments)
-    
+
     print(f"--This folder is {directory_location} folders deep.")
-    
+
     # Checks to see if a folder is an album or subdirectory by looking at how many segments are in a path
     if album_location == directory_location:
         print("--This is an album.")
@@ -125,74 +128,69 @@ def level_check(directory):
     elif album_location < directory_location:
         print("--This is a sub-directory")
         return False
-    elif album_location > directory_location:   
+    elif album_location > directory_location:
         print("--Something is wrong.")
         return False
 
-# A function to check whether a directory has flac and should be checked further    
+
+# A function to check whether a directory has flac and should be checked further
 def flac_check(directory):
-    
-    #Loop through the directory and see if any file is a flac
+
+    # Loop through the directory and see if any file is a flac
     for fname in os.listdir(directory):
-        if fname.endswith('.flac'):
+        if fname.endswith(".flac"):
             print("--There are flac in this directory.")
             return True
         else:
             print("--There are no flac in this directory.")
             return False
 
+
 # A function to check the tags of each file and sort it if critical tags are missing
-def tag_check(directory,is_album):
-    global count
+def tag_check(directory, is_album):
     global bad_tag_directory
     global album_location
     global album_directory
     global move_set
-    
+    global tags_missing
+
     # Get the album name
     segments = directory.split(os.sep)
-    album_location_index = album_location -1
+    album_location_index = album_location - 1
     album_name = str(segments[album_location_index])
-    
+
     # Handle directories vs sub-directories by defining start path taking into account is_album depth
     if is_album == True:
         start_path = directory
     else:
-        #build the path by joining the album directory path with the album name
-        print(f"--The album is {album_location} folders deep")
-        start_path = os.path.join(album_directory,album_name)
-    
-    
-    print(f"--The starting path is: {start_path}")
-    print(f"--The album name is: {album_name}")
-    
-    
-    
-    #loop through direct
+        # build the path by joining the album directory path with the album name
+        start_path = os.path.join(album_directory, album_name)
+
+    # loop through directory and look for missing tags
     for fname in os.listdir(directory):
-        if fname.endswith('.flac'):
+        if fname.endswith(".flac"):
             meta_data = mutagen.File(fname)
-            #print(f"Track Checked: {meta_data['artist'][0]} - {meta_data['title'][0]}")
-            if "tracknumber" not in meta_data:
-                print("--Failure: Metadata Missing: Track Number")
+            if "tracknumber" not in meta_data or "artist" not in meta_data or "title" not in meta_data or "album" not in meta_data:
+                print("--Failure: Metadata Missing")
                 print("--This should be moved to the Missing Tags folder.")
                 target = os.path.join(bad_tag_directory, album_name)
+                print(f"--The starting path is: {start_path}")
                 print(f"--The target is: {target}")
                 # make the pair a tupple
                 move_pair = (start_path, target)
                 # adds the tupple to the list
                 move_set.add(move_pair)
-                count += 1  # variable will increment every loop iteration
+                # log the album is  missing tags
+                print("--Logged missing tags.")
+                log_name = "tags_missing"
+                log_message = f"has tracks that are missing either track number, title, artist or album tags.\nIt has been moved to: {target}"
+                log_outcomes(directory, log_name, log_message)
+                tags_missing += 1  # variable will increment every loop iteration
                 return False
-                
+
     return True
 
-        
 
-        
-        
-        
-        
 # The main function that controls the flow of the script
 def main():
     global move_set
@@ -212,14 +210,13 @@ def main():
         #  Run a loop that goes into each directory identified in the list and runs the function that sorts the folders
         for i in directories:
             os.chdir(i)  # Change working Directory
-            #establish directory level
+            # establish directory level
             is_album = level_check(i)
-            #check for flac
+            # check for flac
             is_flac = flac_check(i)
             # check for meta data and sort
-            if is_flac ==True:
-                tag_check(i,is_album)
-            
+            if is_flac == True:
+                tag_check(i, is_album)
 
         # Change directory so the album directory can be moved and move them
         os.chdir(log_directory)
@@ -239,4 +236,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()        
+    main()
