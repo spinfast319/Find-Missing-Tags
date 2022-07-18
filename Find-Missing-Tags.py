@@ -1,7 +1,8 @@
 # Find Missing Tags
 # author: hypermodified
 # This python script loops through a directory and looks for albums that are missing track number, title, artist, or album tags
-# It moves the album containing those tracks to a folder for retagging.  
+# It moves the album containing those tracks to a folder for retagging.
+# This has only been tested to work with flac files.
 # It can handle albums with artwork folders or multiple disc folders in them. It can also handle specials characters.
 # It has been tested and works in both Ubuntu Linux and Windows 10.
 
