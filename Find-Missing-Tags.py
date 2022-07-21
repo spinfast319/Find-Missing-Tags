@@ -24,7 +24,7 @@ bad_tag_directory = "M:\Python Test Environment\Sorted\Missing Tags"  # Director
 # If you have all your ablums in one music directory Music/Album_name then set this value to 1
 # If you have all your albums nest in a Music/Artist/Album style of pattern set this value to 2
 # The default is 1
-album_depth = 1
+album_depth = 2
 
 # Establishes the counters for completed albums and missing origin files
 count = 0
@@ -146,9 +146,9 @@ def flac_check(directory):
         if fname.endswith(".flac"):
             print("--There are flac in this directory.")
             return True
-        else:
-            print("--There are no flac in this directory.")
-            return False
+        
+    print("--There are no flac in this directory.")
+    return False
 
 
 # A function to check the tags of each file and sort it if critical tags are missing
