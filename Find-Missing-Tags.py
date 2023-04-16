@@ -18,13 +18,13 @@ import mutagen  # Imports functionality to get metadata from music files
 #  Set your directories here
 album_directory = "M:\Python Test Environment\Albums"  # Which directory do you want to start with?
 log_directory = "M:\Python Test Environment\Logs"  # Which directory do you want the log in?
-bad_tag_directory = "M:\Python Test Environment\Sorted\Missing Tags"  # Directory to move albums missing tags to
+sort_directory = "M:\Python Test Environment\Sort - Missing Tags"  # Directory to move albums missing tags to
 
 # Set whether you are using nested folders or have all albums in one directory here
 # If you have all your ablums in one music directory Music/Album_name then set this value to 1
 # If you have all your albums nest in a Music/Artist/Album style of pattern set this value to 2
 # The default is 1
-album_depth = 2
+album_depth = 1
 
 # Establishes the counters for completed albums and missing origin files
 count = 0
@@ -146,14 +146,14 @@ def flac_check(directory):
         if fname.endswith(".flac"):
             print("--There are flac in this directory.")
             return True
-        
+
     print("--There are no flac in this directory.")
     return False
 
 
 # A function to check the tags of each file and sort it if critical tags are missing
 def tag_check(directory, is_album):
-    global bad_tag_directory
+    global sort_directory
     global album_location
     global album_directory
     global move_set
@@ -188,9 +188,9 @@ def tag_check(directory, is_album):
                 print("--Failure: Metadata Missing")
                 print("--This should be moved to the Missing Tags folder.")
                 if album_depth == 1:
-                    target = os.path.join(bad_tag_directory, album_name)
+                    target = os.path.join(sort_directory, album_name)
                 elif album_depth == 2:
-                    target = os.path.join(bad_tag_directory, artist_name, album_name)
+                    target = os.path.join(sort_directory, artist_name, album_name)
                 print(f"--The starting path is: {start_path}")
                 print(f"--The target is: {target}")
                 # make the pair a tupple
