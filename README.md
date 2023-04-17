@@ -1,9 +1,15 @@
 # Find-Missing-Tags
-### This python script loops through a directory and looks for albums that are missing track number, title, artist, or album tags, and then moves the album containing those tracks to a folder for retagging. 
+### This python script loops through a directory and looks for albums that are missing track number, title, artist, or album tags, and then moves the album containing tracks that are missing metadata to a folder for retagging. 
 
 After finding the tracks and moving the albums, it provides messaging and logs what it does so you can look up what it moved. It doesn't specify which tags are missing, you will need to use tagging software to investigate the albums moved. If you have a large music collection you can use this to quickly find albums that need the core tags to be fixed for music players to read them correctly.
 
-It can handle albums with artwork folders or multiple disc folders in them. It can also handle specials characters. It has been tested and works in both Ubuntu Linux and Windows 10. You will need to install the mutagen library with pip for it to work.
+It can handle albums with artwork folders or multiple disc folders in them. It can also handle specials characters. It has been tested and works in both Ubuntu Linux and Windows 10. 
+
+This script is meant to work in conjunction with other scripts in order to manage a large music library when the source of the music has good metadata you want to use to organize it.  You can find an overview of the scripts and workflow at [Origin-Music-Management](https://github.com/spinfast319/Origin-Music-Management). 
+
+## Dependencies
+
+It also has a dependency on the python project Mutagen, which is a library for manipulating music metadata. Instructions on installing it are below.
 
 ## Install and set up
 1) Clone this script where you want to run it.
