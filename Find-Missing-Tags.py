@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Find Missing Tags
 # author: hypermodified
 # This python script loops through a directory and looks for albums that are missing track number, title, artist, or album tags
