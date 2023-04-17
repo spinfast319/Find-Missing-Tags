@@ -16,8 +16,8 @@ import datetime  # Imports functionality that lets you make timestamps
 import mutagen  # Imports functionality to get metadata from music files
 
 #  Set your directories here
-album_directory = "M:\Python Test Environment\Albums"  # Which directory do you want to start with?
-log_directory = "M:\Python Test Environment\Logs"  # Which directory do you want the log in?
+album_directory = "M:\PROCESS"  # Which directory do you want to start with?
+log_directory = "M:\PROCESS-LOGS\Logs"  # Which directory do you want the log in?
 sort_directory = "M:\Python Test Environment\Sort - Missing Tags"  # Directory to move albums missing tags to
 
 # Set whether you are using nested folders or have all albums in one directory here
