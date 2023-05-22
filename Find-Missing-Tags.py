@@ -184,7 +184,7 @@ def tag_check(directory, is_album):
 
     # loop through directory and look for missing tags
     for fname in os.listdir(directory):
-        if fname.endswith(".flac"):
+        if fname.lower().endswith(".flac"):
             meta_data = mutagen.File(fname)
             if "tracknumber" not in meta_data or "artist" not in meta_data or "title" not in meta_data or "album" not in meta_data:
                 print("--Failure: Metadata Missing")
