@@ -145,7 +145,7 @@ def flac_check(directory):
 
     # Loop through the directory and see if any file is a flac
     for fname in os.listdir(directory):
-        if fname.endswith(".flac"):
+        if fname.lower().endswith(".flac"):
             print("--There are flac in this directory.")
             return True
 
